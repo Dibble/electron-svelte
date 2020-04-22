@@ -70,31 +70,35 @@
     }
   }
 
-  const moveFromTableauToFoundation = (column, row) => {
-    console.log('move from tableau to foundation', column, row)
+  const moveFromTableau = (column, row) => {
+    console.log('move from tableau', column, row)
     if (tableau[column][row].face === 'down') { // can't move face down cards to foundation
       console.log('card face down')
-      return
-    }
-
-    if (row >= tableau[column].length) { // not bottom card in the stack
-      console.log('not bottom card')
       return
     }
 
     const card = tableau[column][row]
     console.log('card', card)
 
-    const eligibleFoundationIndex = canMoveToFoundation(card)
+    if (row === tableau[column].length - 1) { // if last card in the column, try move to foundation
+      const eligibleFoundationIndex = canMoveToFoundation(card)
+      console.log('eligible foundation index', eligibleFoundationIndex)
+      if (eligibleFoundationIndex > -1) {
+        tableau[column].pop()
+        tableau[column][row - 1].face = 'up'
+        tableau = tableau
+        
+        foundation[eligibleFoundationIndex] = [...foundation[eligibleFoundationIndex], card]
+        return
+      }
+    }
     
-    console.log('eligible foundation index', eligibleFoundationIndex)
-    if (eligibleFoundationIndex > -1) {
-      console.log('moving card')
-      tableau[column].pop()
-      tableau[column][row - 1].face = 'up'
+    const eligibleTableauColumn = canMoveToTableau(card)
+    console.log('eligible tableau column', eligibleTableauColumn)
+    if (eligibleTableauColumn > -1) {
+      tableau[eligibleTableauColumn] = [...tableau[eligibleTableauColumn], ...tableau[column].splice(row, tableau[column].length - row)]
+      tableau[column][row - 1].face = 'up'      
       tableau = tableau
-
-      foundation[eligibleFoundationIndex] = [...foundation[eligibleFoundationIndex], card]
     }
   }
 
@@ -148,5 +152,5 @@
 <h3>Tableau:</h3>
 {#each tableau as t, col}
   <p>{t.length > 0 ? t.map(card => card.face === 'up' ? `${card.value} of ${card.suit}` : 'hidden').join(', ') : 'empty'}</p>
-  <button on:click={() => moveFromTableauToFoundation(col, t.length - 1)}>Move to Foundation</button>
+  <button on:click={() => moveFromTableau(col, t.length - 1)}>Move</button>
 {/each}

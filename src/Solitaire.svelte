@@ -85,7 +85,7 @@
       console.log('eligible foundation index', eligibleFoundationIndex)
       if (eligibleFoundationIndex > -1) {
         tableau[column].pop()
-        tableau[column][row - 1].face = 'up'
+        if (row > 0) tableau[column][row - 1].face = 'up'
         tableau = tableau
         
         foundation[eligibleFoundationIndex] = [...foundation[eligibleFoundationIndex], card]
@@ -97,7 +97,7 @@
     console.log('eligible tableau column', eligibleTableauColumn)
     if (eligibleTableauColumn > -1) {
       tableau[eligibleTableauColumn] = [...tableau[eligibleTableauColumn], ...tableau[column].splice(row, tableau[column].length - row)]
-      tableau[column][row - 1].face = 'up'      
+      if (row > 0) tableau[column][row - 1].face = 'up'
       tableau = tableau
     }
   }
@@ -123,9 +123,13 @@
 
   const canMoveToTableau = (card) => {
     for (let i = 0; i < tableau.length; i++) {
+      if (tableau[i].length === 0) {
+        if (card.value === 'king') return i // king can move to empty column
+        continue
+      }
+
       let tableauCard = tableau[i][tableau[i].length - 1]
-      if (card.value === 'king' && tableau[i].length === 0 || // king can move to empty column
-        (values.indexOf(card.value) - values.indexOf(tableauCard.value) === 1) && // card value is suitable
+      if ((values.indexOf(card.value) - values.indexOf(tableauCard.value) === 1) && // card value is suitable
         (suits.indexOf(card.suit) < 2 && suits.indexOf(tableauCard.suit) > 1 || // red card on black tableau
         suits.indexOf(card.suit) > 1 && suits.indexOf(tableauCard.suit) < 2)) { // black card on red tableau
         return i
@@ -143,7 +147,7 @@
   initialDeal()
 </script>
 
-<p>Foundation: {foundation.map(f => f.length > 0 ? `${f[f.length - 1].value} of ${f[f.length - 1].suit}` : 'empty')}</p>
+<p>Foundation: {foundation.map(f => f.length > 0 ? `${f[f.length - 1].value} of ${f[f.length - 1].suit}` : 'empty').join(', ')}</p>
 <p>Waste: {waste.length > 0 ? `${waste[waste.length - 1].value} of ${waste[waste.length - 1].suit}` : 'empty'}</p>
 <button on:click={moveFromWaste}>{waste.length > 0 ? 'Play card from waste' : 'Waste empty'}</button>
 <p>Stock: {stock.length}</p>
@@ -152,10 +156,12 @@
 <h3>Tableau:</h3>
 {#each tableau as column, col}
   <ul>
-    {column.length === 0 ? <li>empty</li> :
+    {#if column.length === 0}
+      <li>empty</li>
+    {:else}
       {#each column as card, row}
         <li on:click={() => moveFromTableau(col, row)}>{card.face === 'up' ? `${card.value} of ${card.suit}` : 'hidden'}</li>
       {/each}
-    }
+    {/if}
   </ul>
 {/each}

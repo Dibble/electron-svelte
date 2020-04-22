@@ -150,7 +150,12 @@
 <button on:click={dealFromStock}>{stock.length > 0 ? 'Deal from Stock' : 'Recycle'}</button>
 
 <h3>Tableau:</h3>
-{#each tableau as t, col}
-  <p>{t.length > 0 ? t.map(card => card.face === 'up' ? `${card.value} of ${card.suit}` : 'hidden').join(', ') : 'empty'}</p>
-  <button on:click={() => moveFromTableau(col, t.length - 1)}>Move</button>
+{#each tableau as column, col}
+  <ul>
+    {column.length === 0 ? <li>empty</li> :
+      {#each column as card, row}
+        <li on:click={() => moveFromTableau(col, row)}>{card.face === 'up' ? `${card.value} of ${card.suit}` : 'hidden'}</li>
+      {/each}
+    }
+  </ul>
 {/each}

@@ -122,6 +122,8 @@
   let stock = shuffleCards(deck)
   let waste = []
   let tableau = [[], [], [], [], [], [], []]
+
+  initialDeal()
 </script>
 
 <p>Foundation: {foundation.map(f => f.length > 0 ? `${f[f.length - 1].value} of ${f[f.length - 1].suit}` : 'empty')}</p>
@@ -135,5 +137,3 @@
   <p>{t.length > 0 ? t.map(card => card.face === 'up' ? `${card.value} of ${card.suit}` : 'hidden').join(', ') : 'empty'}</p>
   <button on:click={() => moveFromTableauToFoundation(col, t.length - 1)}>Move to Foundation</button>
 {/each}
-
-<button on:click={initialDeal}>Initial Deal</button>

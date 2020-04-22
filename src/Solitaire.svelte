@@ -47,18 +47,13 @@
   const moveWasteToTableau = () => {
     const card = waste[waste.length - 1]
     console.log('move waste to tab', card)
-    for (let i = 0; i < tableau.length; i++) {
-      let tableauCard = tableau[i][tableau[i].length - 1]
-      if (card.value === 'king' && tableau[i].length === 0 || // king can move to empty column
-        (values.indexOf(card.value) - values.indexOf(tableauCard.value) === 1) && // card value is suitable
-        (suits.indexOf(card.suit) < 2 && suits.indexOf(tableauCard.suit) > 1 || // red card on black tableau
-        suits.indexOf(card.suit) > 1 && suits.indexOf(tableauCard.suit) < 2)) { // black card on red tableau
-          console.log('card can be placed', i)
-          tableau[i] = [...tableau[i], {...card, face: 'up'}]
-          waste.pop()
-          waste = waste
-          break
-      }
+    
+    const eligibleTableauColumn = canMoveToTableau(card)
+    if (eligibleTableauColumn) {
+      console.log('card can be placed', eligibleTableauColumn)
+      tableau[eligibleTableauColumn] = [...tableau[eligibleTableauColumn], {...card, face: 'up'}]
+      waste.pop()
+      waste = waste
     }
   }
 
@@ -77,24 +72,10 @@
     const card = tableau[column][row]
     console.log('card', card)
 
-    let eligibleFoundationIndex = null
-    for (let i = 0; i < foundation.length; i++) {
-      const foundationColumn = foundation[i]
-      if (foundationColumn.length === 0) {
-        eligibleFoundationIndex = card.value === 'ace' ? i : null
-        break
-      }
-
-      if (foundationColumn[0].suit !== card.suit) continue
-
-      if (values.indexOf(foundationColumn[foundationColumn.length - 1].value) - values.indexOf(card.value) === 1) {
-        eligibleFoundationIndex = i
-        break
-      }
-    }
+    const eligibleFoundationIndex = canMoveToFoundation(card)
     
     console.log('eligible foundation index', eligibleFoundationIndex)
-    if (eligibleFoundationIndex !== null) {
+    if (eligibleFoundationIndex) {
       console.log('moving card')
       tableau[column].pop()
       tableau[column][row - 1].face = 'up'
@@ -102,6 +83,39 @@
 
       foundation[eligibleFoundationIndex] = [...foundation[eligibleFoundationIndex], card]
     }
+  }
+
+  const canMoveToFoundation = (card) => {
+    if (card.face === 'down') return false
+
+    for (let i = 0; i < foundation.length; i++) {
+      const foundationColumn = foundation[i]
+      if (foundationColumn.length === 0) {
+        return card.value === 'ace' ? i : false
+      }
+
+      if (foundationColumn[0].suit !== card.suit) continue
+
+      if (values.indexOf(foundationColumn[foundationColumn.length - 1].value) - values.indexOf(card.value) === 1) {
+        return i
+      }
+    }
+
+    return false
+  }
+
+  const canMoveToTableau = (card) => {
+    for (let i = 0; i < tableau.length; i++) {
+      let tableauCard = tableau[i][tableau[i].length - 1]
+      if (card.value === 'king' && tableau[i].length === 0 || // king can move to empty column
+        (values.indexOf(card.value) - values.indexOf(tableauCard.value) === 1) && // card value is suitable
+        (suits.indexOf(card.suit) < 2 && suits.indexOf(tableauCard.suit) > 1 || // red card on black tableau
+        suits.indexOf(card.suit) > 1 && suits.indexOf(tableauCard.suit) < 2)) { // black card on red tableau
+        return i
+      }
+    }
+
+    return false
   }
 
   let foundation = [[], [], [], []]

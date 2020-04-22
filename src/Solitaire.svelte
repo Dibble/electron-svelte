@@ -44,13 +44,26 @@
     waste = [...waste, {...card, face: 'up'}]
   }
 
-  const moveWasteToTableau = () => {
+  const moveFromWaste = () => {
+    if (waste.length === 0) return
+
     const card = waste[waste.length - 1]
-    console.log('move waste to tab', card)
+    console.log('move from waste', card)
+
+    // try move to foundation
+    const eligibleFoundationIndex = canMoveToFoundation(card)
+    if (eligibleFoundationIndex > -1) {
+      console.log('card can be placed in foundation', eligibleFoundationIndex)
+      foundation[eligibleFoundationIndex] = [...foundation[eligibleFoundationIndex], {...card, face: 'up'}]
+      waste.pop()
+      waste = waste
+      return
+    }
     
+    // try move to tableau
     const eligibleTableauColumn = canMoveToTableau(card)
-    if (eligibleTableauColumn) {
-      console.log('card can be placed', eligibleTableauColumn)
+    if (eligibleTableauColumn > -1) {
+      console.log('card can be placed in tableau', eligibleTableauColumn)
       tableau[eligibleTableauColumn] = [...tableau[eligibleTableauColumn], {...card, face: 'up'}]
       waste.pop()
       waste = waste
@@ -75,7 +88,7 @@
     const eligibleFoundationIndex = canMoveToFoundation(card)
     
     console.log('eligible foundation index', eligibleFoundationIndex)
-    if (eligibleFoundationIndex) {
+    if (eligibleFoundationIndex > -1) {
       console.log('moving card')
       tableau[column].pop()
       tableau[column][row - 1].face = 'up'
@@ -86,12 +99,12 @@
   }
 
   const canMoveToFoundation = (card) => {
-    if (card.face === 'down') return false
+    if (card.face === 'down') return -1
 
     for (let i = 0; i < foundation.length; i++) {
       const foundationColumn = foundation[i]
       if (foundationColumn.length === 0) {
-        return card.value === 'ace' ? i : false
+        return card.value === 'ace' ? i : -1
       }
 
       if (foundationColumn[0].suit !== card.suit) continue
@@ -101,7 +114,7 @@
       }
     }
 
-    return false
+    return -1
   }
 
   const canMoveToTableau = (card) => {
@@ -115,7 +128,7 @@
       }
     }
 
-    return false
+    return -1
   }
 
   let foundation = [[], [], [], []]
@@ -128,7 +141,7 @@
 
 <p>Foundation: {foundation.map(f => f.length > 0 ? `${f[f.length - 1].value} of ${f[f.length - 1].suit}` : 'empty')}</p>
 <p>Waste: {waste.length > 0 ? `${waste[waste.length - 1].value} of ${waste[waste.length - 1].suit}` : 'empty'}</p>
-<button on:click={moveWasteToTableau}>{waste.length > 0 ? 'Play card from waste' : 'Waste empty'}</button>
+<button on:click={moveFromWaste}>{waste.length > 0 ? 'Play card from waste' : 'Waste empty'}</button>
 <p>Stock: {stock.length}</p>
 <button on:click={dealFromStock}>{stock.length > 0 ? 'Deal from Stock' : 'Recycle'}</button>
 

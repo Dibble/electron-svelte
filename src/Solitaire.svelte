@@ -102,6 +102,21 @@
     }
   }
 
+  const moveFromFoundation = (column) => {
+    console.log('move from foundation')
+    if (foundation[column].length === 0) return
+
+    const card = foundation[column][foundation[column].length - 1]
+    console.log('card', card)
+    const eligibleTableauColumn = canMoveToTableau(card)
+    console.log('eligible tableau column', eligibleTableauColumn)
+    if (eligibleTableauColumn > -1) {
+      tableau[eligibleTableauColumn] = [...tableau[eligibleTableauColumn], card]
+      foundation[column].pop()
+      foundation = foundation
+    }
+  }
+
   const canMoveToFoundation = (card) => {
     if (card.face === 'down') return -1
 
@@ -147,7 +162,10 @@
   initialDeal()
 </script>
 
-<p>Foundation: {foundation.map(f => f.length > 0 ? `${f[f.length - 1].value} of ${f[f.length - 1].suit}` : 'empty').join(', ')}</p>
+<h3>Foundation:</h3>
+{#each foundation as f, col}
+  <p on:click={() => moveFromFoundation(col)}>{f.length > 0 ? `${f[f.length - 1].value} of ${f[f.length - 1].suit}` : 'empty'}</p>
+{/each}
 <p>Waste: {waste.length > 0 ? `${waste[waste.length - 1].value} of ${waste[waste.length - 1].suit}` : 'empty'}</p>
 <button on:click={moveFromWaste}>{waste.length > 0 ? 'Play card from waste' : 'Waste empty'}</button>
 <p>Stock: {stock.length}</p>

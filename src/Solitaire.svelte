@@ -110,7 +110,7 @@
   let tableau = [[], [], [], [], [], [], []]
 </script>
 
-<p>Foundation: {foundation.map(f => f.length > 0 ? f[f.length - 1] : 'empty')}</p>
+<p>Foundation: {foundation.map(f => f.length > 0 ? `${f[f.length - 1].value} of ${f[f.length - 1].suit}` : 'empty')}</p>
 <p>Waste: {waste.length > 0 ? `${waste[waste.length - 1].value} of ${waste[waste.length - 1].suit}` : 'empty'}</p>
 <button on:click={moveWasteToTableau}>{waste.length > 0 ? 'Play card from waste' : 'Waste empty'}</button>
 <p>Stock: {stock.length}</p>

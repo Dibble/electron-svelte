@@ -31,6 +31,19 @@
     return outputCards
   }
 
+  const dealFromStock = () => { // assume one card at a time, unlimited cycles
+    if (stock.length === 0) {
+      stock = [...waste].reverse()
+      waste = []
+      return
+    }
+
+    const card = stock.pop()
+    stock = stock
+
+    waste = [...waste, card]
+  }
+
   let foundation = [[], [], [], []]
   let stock = shuffleCards(deck)
   let waste = []
@@ -38,8 +51,9 @@
 </script>
 
 <p>Foundation: {foundation.map(f => f.length > 0 ? f[f.length - 1] : 'empty')}</p>
-<p>Waste: {waste.length > 0 ? waste[waste.length - 1] : 'empty'}</p>
+<p>Waste: {waste.length > 0 ? `${waste[waste.length - 1].value} of ${waste[waste.length - 1].suit}` : 'empty'}</p>
 <p>Stock: {stock.length}</p>
+<button on:click={dealFromStock}>{stock.length > 0 ? 'Deal from Stock' : 'Recycle'}</button>
 
 <h3>Tableau:</h3>
 {#each tableau as t}

@@ -1,6 +1,6 @@
 <script>
   const suits = ['hearts', 'diamonds', 'spades', 'clubs']
-  const values = ['ace', 'king', 'queen', 'jack', 'ten', 'nine', 'eight', 'seven', 'six', 'five', 'four', 'three', 'two']
+  const values = ['king', 'queen', 'jack', 'ten', 'nine', 'eight', 'seven', 'six', 'five', 'four', 'three', 'two', 'ace']
   const deck = suits.map(suit => values.map(value => ({ face: 'down', suit, value}))).flat()
 
   const initialDeal = () => {
@@ -33,7 +33,7 @@
 
   const dealFromStock = () => { // assume one card at a time, unlimited cycles
     if (stock.length === 0) {
-      stock = [...waste].reverse()
+      stock = [...waste].map(card => ({...card, face: 'down'})).reverse()
       waste = []
       return
     }
@@ -41,7 +41,27 @@
     const card = stock.pop()
     stock = stock
 
-    waste = [...waste, card]
+    waste = [...waste, {...card, face: 'up'}]
+  }
+
+  const moveWasteToTableau = () => {
+    const card = waste[waste.length - 1]
+    console.log('move waste to tab', card)
+    for (let i = 0; i < tableau.length; i++) {
+      let tableauCard = tableau[i][tableau[i].length - 1]
+      // can card be placed here
+      if (card.value === 'king' && tableau[i].length === 0 || // king can move to empty column
+        (values.indexOf(card.value) - values.indexOf(tableauCard.value) === 1) && // card value is suitable
+        (suits.indexOf(card.suit) < 2 && suits.indexOf(tableauCard.suit) > 1 || // red card on black tableau
+        suits.indexOf(card.suit) > 1 && suits.indexOf(tableauCard.suit) < 2)) { // black card on red tableau
+          console.log('card can be placed', i)
+          tableau[i] = [...tableau[i], {...card, face: 'up'}]
+          // tableau = tableau
+          waste.pop()
+          waste = waste
+          break
+      }
+    }
   }
 
   let foundation = [[], [], [], []]
@@ -52,6 +72,7 @@
 
 <p>Foundation: {foundation.map(f => f.length > 0 ? f[f.length - 1] : 'empty')}</p>
 <p>Waste: {waste.length > 0 ? `${waste[waste.length - 1].value} of ${waste[waste.length - 1].suit}` : 'empty'}</p>
+<button on:click={moveWasteToTableau}>{waste.length > 0 ? 'Play card from waste' : 'Waste empty'}</button>
 <p>Stock: {stock.length}</p>
 <button on:click={dealFromStock}>{stock.length > 0 ? 'Deal from Stock' : 'Recycle'}</button>
 

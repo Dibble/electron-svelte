@@ -17,7 +17,14 @@ desktopCapturer.getSources({ types: ['screen'] })
         }
       }
     })
-    .then(stream => console.log(stream))
+    .then(stream => {
+      console.log(stream)
+
+      const video = document.getElementById('video')
+      console.log(video)
+      video.srcObject = stream
+      video.onloadedmetadata  = (e) => video.play()
+    })
     .catch(err => console.log(err))
   })
   .catch(err => console.log(err))

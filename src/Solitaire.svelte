@@ -72,7 +72,7 @@
 
   const moveFromTableau = (column, row) => {
     console.log('move from tableau', column, row)
-    if (tableau[column][row].face === 'down') { // can't move face down cards to foundation
+    if (tableau[column][row].face === 'down') { // can't move face down cards
       console.log('card face down')
       return
     }

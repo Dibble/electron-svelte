@@ -5,7 +5,9 @@ const mode = process.env.NODE_ENV || 'development';
 const prod = mode === 'production';
 
 module.exports = {
+	target: 'electron-renderer',
 	entry: {
+		desktopCapture: ['./src/desktopCapture.js'],
 		solitaire: ['./src/solitaire.js']
 	},
 	resolve: {

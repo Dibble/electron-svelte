@@ -9,7 +9,8 @@ const createWindow = () => {
     }
   })
 
-  win.loadFile('windows/solitaire.html')
+  // win.loadFile('windows/solitaire.html')
+  win.loadFile('windows/desktopCapture.html')
 
   win.webContents.openDevTools()
 }

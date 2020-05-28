@@ -1,4 +1,6 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, systemPreferences } = require('electron')
+
+console.log('screen access: ', systemPreferences.getMediaAccessStatus('screen'))
 
 const createWindow = () => {
   const win = new BrowserWindow({
